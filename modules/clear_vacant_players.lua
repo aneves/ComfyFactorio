@@ -14,6 +14,7 @@ local this = {
         active_surface_index = nil, -- needs to be set else this will fail, remember to call "init()".
         required_online_time = default_required_online_time,
         clear_player_after_tick = default_clear_player_after_tick,
+        dumped_inventories_do_not_expire = true,
         surfaces_to_ignore = {},
     },
     offline_players = {}
@@ -116,6 +117,13 @@ function Public.dump_expired_players()
                                 Alert.alert_all_players_location(data, message, nil, 20)
 
                                 e.die('neutral')
+                                if this.settings.dumped_inventories_do_not_expire == true then
+                                    -- Let's try to ensure that the corpse won't expire or get cleared.
+                                    -- That would defeat the purpose of this module.
+                                    local corpse = e.character_corpse
+                                    corpse.corpse_expires = false
+                                    corpse.corpse_immune_to_entity_placement = true
+                                end
                             else
                                 e.destroy()
                             end
